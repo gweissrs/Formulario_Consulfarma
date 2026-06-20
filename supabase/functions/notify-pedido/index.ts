@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const EMAIL_DESTINO = 'coanaconsulfarma@gmail.com'
+const EMAIL_DESTINO = Deno.env.get('EMAIL_DESTINO') || 'coanaconsulfarma@gmail.com'
 
 function formatarMoeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -169,7 +169,7 @@ serve(async (req: Request) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'COANA Feirao <pedidos@coana.com.br>',
+        from: 'COANA Feirao <onboarding@resend.dev>',
         to: [EMAIL_DESTINO],
         subject: `[Consulfarma 2026] Novo pedido — ${payload.cliente.razaoSocial} | ${totalItens} itens | R$ ${payload.valorTotal.toFixed(2)}`,
         html,

@@ -50,12 +50,26 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
 
       if (clienteError) throw clienteError
 
-      // 2. Inserir pedido
+      // 2. Resolver atendente — se for "Outro", inserir no banco primeiro
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      let atendenteId = pedido.atendente.id
+
+      if (!uuidRegex.test(atendenteId)) {
+        const { data: atendenteData, error: atendenteError } = await supabase
+          .from('atendentes')
+          .insert({ nome: pedido.atendente.nome })
+          .select('id')
+          .single()
+        if (atendenteError) throw atendenteError
+        atendenteId = atendenteData.id
+      }
+
+      // 3. Inserir pedido
       const { data: pedidoData, error: pedidoError } = await supabase
         .from('pedidos')
         .insert({
           cliente_id: clienteData.id,
-          atendente_id: pedido.atendente.id,
+          atendente_id: atendenteId,
           valor_total: valorTotal,
           status: 'pendente',
         })
