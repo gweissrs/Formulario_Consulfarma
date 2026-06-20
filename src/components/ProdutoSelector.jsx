@@ -217,7 +217,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
       </div>
 
       {totalItens > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-3 bg-surface border-t border-border">
+        <div className="fixed-bottom-bar px-4 pb-6 pt-3 bg-surface border-t border-border">
           <button
             onClick={onVerCarrinho}
             className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"

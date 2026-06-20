@@ -14,7 +14,7 @@ export function IntroAnimation({ onComplete }) {
 
   return (
     <div
-      className={`fixed inset-0 bg-bg flex flex-col items-center justify-center z-50 ${saindo ? 'intro-saindo' : ''}`}
+      className={`absolute inset-0 bg-bg flex flex-col items-center justify-center z-50 ${saindo ? 'intro-saindo' : ''}`}
     >
       <div className="intro-logo flex flex-col items-center">
         <img

@@ -36,7 +36,40 @@ body {
 }
 
 #root {
+  max-width: 480px;
+  margin: 0 auto;
   min-height: 100vh;
+  position: relative;
+}
+
+@media (min-width: 481px) {
+  body {
+    background-color: #D1D5DB;
+  }
+
+  #root {
+    box-shadow: 0 0 48px rgba(0, 0, 0, 0.14);
+  }
+}
+
+.fixed-bar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  z-index: 30;
+}
+
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  z-index: 20;
 }
 
 /* Animações de intro */

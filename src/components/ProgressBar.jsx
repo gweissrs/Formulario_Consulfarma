@@ -11,7 +11,7 @@ export function ProgressBar({ step, onVoltar }) {
   const progresso = (step / 4) * 100
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-30">
+    <div className="fixed-bar">
       <div
         className="bg-surface border-b border-border h-14 flex items-center px-4"
         style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
