@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 
 function aplicarMascaraCNPJ(valor) {
@@ -22,19 +21,8 @@ function validarEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-const camposIniciais = {
-  razaoSocial: '',
-  cnpj: '',
-  email: '',
-  whatsapp: '',
-}
-
-const errosIniciais = {
-  razaoSocial: '',
-  cnpj: '',
-  email: '',
-  whatsapp: '',
-}
+const camposIniciais = { razaoSocial: '', cnpj: '', email: '', whatsapp: '' }
+const errosIniciais = { razaoSocial: '', cnpj: '', email: '', whatsapp: '' }
 
 export function ClienteForm({ onConfirmar, atendente }) {
   const [campos, setCampos] = useState(camposIniciais)
@@ -59,15 +47,23 @@ export function ClienteForm({ onConfirmar, atendente }) {
   }
 
   function validarCampo(campo, valor) {
-    if (!valor.trim()) return 'Campo obrigatório'
+    if (!valor.trim()) {
+      const mensagens = {
+        razaoSocial: 'Informe a razão social da empresa.',
+        cnpj: 'CNPJ inválido. Verifique os 14 dígitos.',
+        email: 'Informe um e-mail válido.',
+        whatsapp: 'Número inválido. Use o formato (00) 00000-0000.',
+      }
+      return mensagens[campo]
+    }
     if (campo === 'cnpj') {
       const digits = valor.replace(/\D/g, '')
-      if (digits.length !== 14) return 'CNPJ deve ter 14 dígitos'
+      if (digits.length !== 14) return 'CNPJ inválido. Verifique os 14 dígitos.'
     }
-    if (campo === 'email' && !validarEmail(valor)) return 'Email inválido'
+    if (campo === 'email' && !validarEmail(valor)) return 'Informe um e-mail válido.'
     if (campo === 'whatsapp') {
       const digits = valor.replace(/\D/g, '')
-      if (digits.length !== 11) return 'WhatsApp deve ter 11 dígitos'
+      if (digits.length !== 11) return 'Número inválido. Use o formato (00) 00000-0000.'
     }
     return ''
   }
@@ -103,22 +99,24 @@ export function ClienteForm({ onConfirmar, atendente }) {
     campos.whatsapp.replace(/\D/g, '').length === 11
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col step-transicao">
-      <div className="bg-primary px-4 pt-12 pb-6">
-        <h1 className="text-white text-2xl font-bold">Dados do Cliente</h1>
-        <p className="text-red-200 text-sm mt-1">
-          Atendente: <span className="font-semibold text-white">{atendente?.nome}</span>
-        </p>
-      </div>
-
+    <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
       <div className="flex-1 px-4 py-6 flex flex-col gap-4">
+        <div className="mb-2">
+          <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
+            Dados do Cliente
+          </h1>
+          <p className="text-[14px] text-gray-400">
+            Preencha com as informações da empresa interessada.
+          </p>
+        </div>
+
         <Input
           label="Razão Social"
           value={campos.razaoSocial}
           onChange={e => atualizarCampo('razaoSocial', e.target.value)}
           onBlur={() => marcarTocado('razaoSocial')}
           erro={erros.razaoSocial}
-          placeholder="Nome da empresa"
+          placeholder="Nome oficial da empresa"
           autoComplete="organization"
         />
 
@@ -134,7 +132,7 @@ export function ClienteForm({ onConfirmar, atendente }) {
         />
 
         <Input
-          label="Email"
+          label="E-mail Corporativo"
           type="email"
           value={campos.email}
           onChange={e => atualizarCampo('email', e.target.value)}
@@ -158,14 +156,18 @@ export function ClienteForm({ onConfirmar, atendente }) {
       </div>
 
       <div className="px-4 pb-8 pt-2">
-        <Button
-          larguraTotal
-          disabled={!tudoPreenchido}
+        <button
           onClick={handleSubmit}
-          className="h-14 text-base"
+          disabled={!tudoPreenchido}
+          className={`
+            w-full h-[52px] rounded-xl font-semibold text-[15px] text-white
+            bg-primary transition-all duration-150
+            disabled:opacity-40 disabled:cursor-not-allowed
+            hover:bg-primary-hover active:bg-primary-dark
+          `}
         >
-          Continuar
-        </Button>
+          Avançar para produtos →
+        </button>
       </div>
     </div>
   )

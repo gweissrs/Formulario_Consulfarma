@@ -1,16 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-bg: #F7F4F0;
+  --color-surface: #FFFFFF;
+  --color-primary: #8B2020;
+  --color-primary-hover: #7A1A1A;
+  --color-accent: #F5A800;
+  --color-text-strong: #111827;
+  --color-text-body: #374151;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-error: #DC2626;
+  --color-success: #16A34A;
+}
 
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
+  box-shadow: 0 0 0px 1000px #FFFFFF inset;
+  -webkit-text-fill-color: #111827;
+}
+
 body {
-  background-color: #F9F9F9;
+  background-color: var(--color-bg);
   font-family: 'Inter', sans-serif;
-  color: #1A1A1A;
+  color: var(--color-text-strong);
   margin: 0;
 }
 
@@ -19,46 +40,51 @@ body {
 }
 
 /* Animações de intro */
-@keyframes fadeInScale {
+@keyframes introEnter {
   from {
     opacity: 0;
-    transform: scale(0.85);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
 @keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideDown {
   from {
     opacity: 0;
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes checkDraw {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
 }
 
 .intro-logo {
-  animation: fadeInScale 0.6s ease-out forwards;
+  animation: introEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .intro-saindo {
@@ -67,6 +93,14 @@ body {
 
 .step-transicao {
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+.check-pop {
+  animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.slide-down {
+  animation: slideDown 0.2s ease-out forwards;
 }
 
 .check-animado {

@@ -1,16 +1,14 @@
 import { useState } from 'react'
-import { X, ChevronLeft } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
 import { salvarPedidoLocal, removerPedidoLocal } from '../lib/offline'
-import { Button } from './ui/Button'
-import { Card } from './ui/Card'
 
 function formatarMoeda(valor) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, onVoltar, onSucesso }) {
+export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, onSucesso }) {
   const [enviando, setEnviando] = useState(false)
 
   function atualizarQuantidade(produto, novaQtd) {
@@ -29,14 +27,11 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
       criadoEm: new Date().toISOString(),
     }
 
-    // Buffer offline: salvar localmente antes de qualquer tentativa de rede
     salvarPedidoLocal(payloadPedido)
 
-    let pedidoOffline = false
     let timestampLocal = payloadPedido.timestamp
 
     try {
-      // 1. Inserir cliente
       const { data: clienteData, error: clienteError } = await supabase
         .from('clientes')
         .insert({
@@ -50,7 +45,6 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
 
       if (clienteError) throw clienteError
 
-      // 2. Resolver atendente — se for "Outro", inserir no banco primeiro
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       let atendenteId = pedido.atendente.id
 
@@ -64,7 +58,6 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
         atendenteId = atendenteData.id
       }
 
-      // 3. Inserir pedido
       const { data: pedidoData, error: pedidoError } = await supabase
         .from('pedidos')
         .insert({
@@ -78,7 +71,6 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
 
       if (pedidoError) throw pedidoError
 
-      // 3. Inserir itens
       const itens = pedido.itens.map(item => ({
         pedido_id: pedidoData.id,
         produto_id: item.produto.id,
@@ -93,7 +85,6 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
 
       if (itensError) throw itensError
 
-      // 4. Notificar por email via Edge Function
       try {
         await supabase.functions.invoke('notify-pedido', {
           body: { ...payloadPedido, pedidoId: pedidoData.id },
@@ -102,13 +93,10 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
         // Falha no email não bloqueia o fluxo
       }
 
-      // 5. Pedido salvo com sucesso: remover do buffer local
       removerPedidoLocal(timestampLocal)
-
       onSucesso({ offline: false })
     } catch (err) {
       console.error('Erro ao enviar pedido:', err)
-      pedidoOffline = true
       toast('Pedido salvo localmente. Será sincronizado quando a conexão retornar.', {
         icon: '⚠️',
         style: { background: '#FEF3C7', color: '#92400E' },
@@ -121,98 +109,121 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
   }
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col step-transicao">
-      <div className="bg-primary px-4 pt-12 pb-6">
-        <button
-          onClick={onVoltar}
-          className="flex items-center gap-1 text-red-200 mb-3 text-sm"
-        >
-          <ChevronLeft size={16} /> Voltar
-        </button>
-        <h1 className="text-white text-2xl font-bold">Revisão do Pedido</h1>
-      </div>
-
-      <div className="flex-1 px-4 py-6 flex flex-col gap-4">
-        {/* Itens */}
+    <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
+      <div className="flex-1 px-4 py-6 flex flex-col gap-5">
         <div>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Produtos ({pedido.itens.length})
-          </h2>
-          <div className="flex flex-col gap-3">
-            {pedido.itens.map(({ produto, quantidade }) => (
-              <Card key={produto.id} className="flex items-center gap-3 p-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500 mb-0.5">{produto.codigo}</p>
-                  <p className="text-sm font-medium text-gray-800 leading-tight truncate">
-                    {produto.nome}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    R$ {produto.preco_env?.toFixed(2)} × {quantidade} ={' '}
-                    <span className="font-semibold text-primary">
-                      {formatarMoeda(produto.preco_env * quantidade)}
-                    </span>
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <input
-                    type="number"
-                    value={quantidade}
-                    min={1}
-                    onChange={e => atualizarQuantidade(produto, e.target.value)}
-                    className="w-14 text-center text-sm font-bold border border-gray-200 rounded-lg py-1.5 focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <button
-                    onClick={() => onRemoverItem(produto.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              </Card>
-            ))}
+          <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
+            Revisão do Pedido
+          </h1>
+          <p className="text-[14px] text-gray-400">
+            Confirme os itens antes de enviar.
+          </p>
+        </div>
+
+        {/* Cliente */}
+        <div>
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.08em] mb-2">
+            Cliente
+          </p>
+          <div className="bg-surface rounded-xl p-4 border border-border shadow-card">
+            <p className="text-[14px] font-semibold text-gray-900">{pedido.cliente?.razaoSocial}</p>
+            <p className="text-[13px] text-gray-500 mt-0.5">{pedido.cliente?.cnpjFormatado}</p>
+            <p className="text-[13px] text-gray-500">{pedido.cliente?.email}</p>
+            <p className="text-[13px] text-gray-500">{pedido.cliente?.whatsappFormatado}</p>
           </div>
         </div>
 
-        {/* Resumo do cliente */}
+        {/* Produtos selecionados */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Cliente</h2>
-          <Card>
-            <p className="font-semibold text-gray-800">{pedido.cliente?.razaoSocial}</p>
-            <p className="text-sm text-gray-500 mt-0.5">{pedido.cliente?.cnpjFormatado}</p>
-            <p className="text-sm text-gray-500">{pedido.cliente?.email}</p>
-            <p className="text-sm text-gray-500">{pedido.cliente?.whatsappFormatado}</p>
-          </Card>
-        </div>
-
-        {/* Atendente */}
-        <div>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Atendente</h2>
-          <Card>
-            <p className="font-semibold text-gray-800">{pedido.atendente?.nome}</p>
-          </Card>
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.08em] mb-2">
+            Produtos Selecionados
+          </p>
+          <div className="flex flex-col gap-2">
+            {pedido.itens.map(({ produto, quantidade }) => {
+              const subtotal = produto.preco_env * quantidade
+              return (
+                <div key={produto.id} className="bg-surface rounded-xl p-4 border border-border shadow-card">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <p className="text-[13px] font-medium text-gray-900 leading-tight flex-1">
+                      {produto.nome}
+                    </p>
+                    <p className="text-[14px] font-semibold text-gray-900 flex-shrink-0">
+                      {formatarMoeda(subtotal)}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] font-semibold text-gray-500">
+                        {produto.codigo}
+                      </span>
+                      <div className="flex items-center gap-1 border border-border rounded px-1">
+                        <button
+                          onClick={() => atualizarQuantidade(produto, quantidade - 1)}
+                          className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          value={quantidade}
+                          min={1}
+                          onChange={e => atualizarQuantidade(produto, e.target.value)}
+                          className="w-12 text-center text-[13px] font-semibold text-gray-900 border-none bg-transparent focus:outline-none py-1"
+                        />
+                        <button
+                          onClick={() => atualizarQuantidade(produto, quantidade + 1)}
+                          className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => onRemoverItem(produto.id)}
+                      className="text-gray-400 hover:text-error transition-colors p-1"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         {/* Total */}
-        <div className="bg-red-50 border border-red-100 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Valor Total</span>
-            <span className="text-2xl font-bold text-primary">
-              {formatarMoeda(valorTotal)}
-            </span>
-          </div>
+        <div className="bg-[#FDF5F5] border border-accent rounded-xl p-4">
+          <p className="text-[13px] text-gray-700 mb-1">Valor estimado do pedido</p>
+          <p className="font-display text-[32px] font-bold text-primary leading-none">
+            {formatarMoeda(valorTotal)}
+          </p>
+          <p className="text-[11px] text-gray-400 mt-2">
+            * Sujeito a confirmação comercial
+          </p>
         </div>
       </div>
 
       <div className="px-4 pb-8 pt-2">
-        <Button
-          larguraTotal
-          loading={enviando}
-          disabled={pedido.itens.length === 0}
+        <button
           onClick={handleEnviar}
-          className="h-14 text-base"
+          disabled={enviando || pedido.itens.length === 0}
+          className={`
+            w-full h-[52px] rounded-xl font-semibold text-[15px] text-white
+            bg-primary transition-all duration-150
+            disabled:opacity-40 disabled:cursor-not-allowed
+            hover:bg-primary-hover active:bg-primary-dark
+            flex items-center justify-center gap-2
+          `}
         >
-          {enviando ? 'Enviando pedido...' : 'Enviar Pedido'}
-        </Button>
+          {enviando ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Enviando...
+            </>
+          ) : (
+            'Enviar pedido'
+          )}
+        </button>
       </div>
     </div>
   )

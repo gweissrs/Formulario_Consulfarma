@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { User } from 'lucide-react'
-import { Card } from './ui/Card'
-import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 
 const ATENDENTES_FIXOS = [
@@ -11,6 +9,7 @@ const ATENDENTES_FIXOS = [
   'Francine',
   'Edna',
   'Jean',
+  'Auto Atendimento',
 ]
 
 export function AtendentePicker({ onConfirmar }) {
@@ -40,68 +39,59 @@ export function AtendentePicker({ onConfirmar }) {
     (selecionado !== 'Outro' || nomeOutro.trim().length > 0)
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col step-transicao">
-      <div className="bg-primary px-4 pt-12 pb-6">
-        <h1 className="text-white text-2xl font-bold">Quem está atendendo?</h1>
-        <p className="text-red-200 text-sm mt-1">Selecione seu nome para começar</p>
-      </div>
+    <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
+      <div className="flex-1 px-4 py-6 flex flex-col">
+        <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
+          Quem está atendendo?
+        </h1>
+        <p className="text-[14px] text-gray-400 mb-6">
+          Selecione seu nome para registrar o pedido corretamente.
+        </p>
 
-      <div className="flex-1 px-4 py-6">
         <div className="grid grid-cols-2 gap-3">
-          {ATENDENTES_FIXOS.map(nome => (
-            <Card
-              key={nome}
-              selecionado={selecionado === nome}
-              onClick={() => handleSelecionar(nome)}
-              className="flex items-center gap-3 min-h-[56px]"
-            >
-              <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  selecionado === nome ? 'bg-primary' : 'bg-gray-100'
-                }`}
+          {ATENDENTES_FIXOS.map(nome => {
+            const ativo = selecionado === nome
+            return (
+              <button
+                key={nome}
+                onClick={() => handleSelecionar(nome)}
+                className={`
+                  flex items-center gap-2 px-3 py-3 rounded-xl min-h-[52px]
+                  border-[1.5px] transition-all duration-150 text-left
+                  ${ativo
+                    ? 'border-primary bg-red-50'
+                    : 'border-border bg-surface hover:border-gray-300'
+                  }
+                `}
               >
-                <User
-                  size={18}
-                  className={selecionado === nome ? 'text-white' : 'text-gray-500'}
-                />
-              </div>
-              <span
-                className={`font-semibold text-sm ${
-                  selecionado === nome ? 'text-primary' : 'text-gray-800'
-                }`}
-              >
-                {nome}
-              </span>
-            </Card>
-          ))}
+                <User size={20} className={ativo ? 'text-primary' : 'text-gray-400'} />
+                <span className={`text-[14px] font-medium ${ativo ? 'text-primary' : 'text-gray-900'}`}>
+                  {nome}
+                </span>
+              </button>
+            )
+          })}
 
-          <Card
-            selecionado={selecionado === 'Outro'}
+          <button
             onClick={() => handleSelecionar('Outro')}
-            className="flex items-center gap-3 min-h-[56px]"
+            className={`
+              flex items-center gap-2 px-3 py-3 rounded-xl min-h-[52px]
+              border-[1.5px] transition-all duration-150 text-left
+              ${selecionado === 'Outro'
+                ? 'border-primary bg-red-50'
+                : 'border-border bg-surface hover:border-gray-300'
+              }
+            `}
           >
-            <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                selecionado === 'Outro' ? 'bg-accent' : 'bg-gray-100'
-              }`}
-            >
-              <User
-                size={18}
-                className={selecionado === 'Outro' ? 'text-white' : 'text-gray-500'}
-              />
-            </div>
-            <span
-              className={`font-semibold text-sm ${
-                selecionado === 'Outro' ? 'text-gray-800' : 'text-gray-800'
-              }`}
-            >
-              Outro
+            <User size={20} className={selecionado === 'Outro' ? 'text-primary' : 'text-gray-400'} />
+            <span className={`text-[14px] font-medium ${selecionado === 'Outro' ? 'text-primary' : 'text-gray-900'}`}>
+              Outro atendente
             </span>
-          </Card>
+          </button>
         </div>
 
         {mostrarOutro && (
-          <div className="mt-4">
+          <div className="mt-4 slide-down">
             <Input
               label="Digite seu nome"
               value={nomeOutro}
@@ -114,14 +104,18 @@ export function AtendentePicker({ onConfirmar }) {
       </div>
 
       <div className="px-4 pb-8 pt-2">
-        <Button
-          larguraTotal
-          disabled={!atendenteBotaoHabilitado}
+        <button
           onClick={handleConfirmar}
-          className="h-14 text-base"
+          disabled={!atendenteBotaoHabilitado}
+          className={`
+            w-full h-[52px] rounded-xl font-semibold text-[15px] text-white
+            bg-primary transition-all duration-150
+            disabled:opacity-40 disabled:cursor-not-allowed
+            hover:bg-primary-hover active:bg-primary-dark
+          `}
         >
-          Continuar
-        </Button>
+          Confirmar e continuar →
+        </button>
       </div>
     </div>
   )

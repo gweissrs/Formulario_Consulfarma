@@ -15,11 +15,11 @@ export function Input({
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
 
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
+    <div className={`flex flex-col ${className}`}>
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-gray-700"
+          className="text-[13px] font-medium text-gray-700 mb-1.5"
         >
           {label}
         </label>
@@ -35,18 +35,19 @@ export function Input({
         autoComplete={autoComplete}
         maxLength={maxLength}
         className={`
-          w-full px-4 py-3 rounded-xl border transition-colors duration-150
-          bg-white text-gray-900 placeholder-gray-400
-          focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+          w-full px-[14px] py-3 rounded bg-surface text-gray-900
+          placeholder-gray-400 text-[14px]
+          border-[1.5px] transition-colors duration-150
+          focus:outline-none
           min-h-[48px]
           ${erro
-            ? 'border-red-500 focus:ring-red-500'
-            : 'border-gray-200 hover:border-gray-300'
+            ? 'border-error focus:border-error'
+            : 'border-border focus:border-primary hover:border-gray-300'
           }
         `}
       />
       {erro && (
-        <span className="text-sm text-red-600">{erro}</span>
+        <span className="text-[12px] text-red-600 mt-1">{erro}</span>
       )}
     </div>
   )

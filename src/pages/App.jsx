@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { usePedido } from '../hooks/usePedido'
 import { IntroAnimation } from '../components/IntroAnimation'
+import { ProgressBar } from '../components/ProgressBar'
 import { AtendentePicker } from '../components/AtendentePicker'
 import { ClienteForm } from '../components/ClienteForm'
 import { ProdutoSelector } from '../components/ProdutoSelector'
@@ -50,8 +51,10 @@ export default function App() {
     setStep(STEPS.CHECKOUT)
   }
 
-  function handleVoltarParaProdutos() {
-    setStep(STEPS.PRODUTOS)
+  function handleVoltar() {
+    if (step === STEPS.CLIENTE) setStep(STEPS.ATENDENTE)
+    else if (step === STEPS.PRODUTOS) setStep(STEPS.CLIENTE)
+    else if (step === STEPS.CHECKOUT) setStep(STEPS.PRODUTOS)
   }
 
   function handlePedidoEnviado(resultado) {
@@ -69,9 +72,18 @@ export default function App() {
     setStep(STEPS.ATENDENTE)
   }
 
+  const mostrarProgressBar = step >= STEPS.ATENDENTE && step <= STEPS.CHECKOUT
+
   return (
     <>
       <Toaster position="top-center" />
+
+      {mostrarProgressBar && (
+        <ProgressBar
+          step={step}
+          onVoltar={step > STEPS.ATENDENTE ? handleVoltar : null}
+        />
+      )}
 
       {step === STEPS.INTRO && (
         <IntroAnimation onComplete={handleIntroCompleto} />
@@ -102,7 +114,6 @@ export default function App() {
           valorTotal={valorTotal}
           onRemoverItem={removerItem}
           onAdicionarItem={adicionarItem}
-          onVoltar={handleVoltarParaProdutos}
           onSucesso={handlePedidoEnviado}
         />
       )}

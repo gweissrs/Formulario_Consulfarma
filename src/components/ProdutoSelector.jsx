@@ -1,82 +1,20 @@
 import { useState, useEffect } from 'react'
-import { Search, ShoppingCart, Plus, Minus, X } from 'lucide-react'
+import { Search, Plus, Minus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { Badge } from './ui/Badge'
-import { Button } from './ui/Button'
 
-function SkeletonProduto() {
+function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+    <div className="bg-surface rounded-xl border border-border p-4 animate-pulse">
       <div className="flex items-start gap-3">
-        <div className="w-16 h-4 bg-gray-200 rounded" />
+        <div className="w-14 h-4 bg-gray-200 rounded" />
         <div className="flex-1">
           <div className="h-4 bg-gray-200 rounded w-full mb-2" />
           <div className="h-3 bg-gray-100 rounded w-3/4" />
         </div>
       </div>
-      <div className="flex gap-4 mt-3">
-        <div className="h-5 bg-gray-200 rounded w-20" />
-        <div className="h-5 bg-gray-200 rounded w-20" />
-      </div>
-    </div>
-  )
-}
-
-function ModalQuantidade({ produto, quantidadeAtual, onConfirmar, onFechar }) {
-  const [quantidade, setQuantidade] = useState(quantidadeAtual || 1)
-
-  function ajustar(delta) {
-    setQuantidade(prev => Math.max(1, prev + delta))
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-40 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1 pr-4">
-            <Badge variante="default" className="mb-2">{produto.codigo}</Badge>
-            <h3 className="text-sm font-semibold text-gray-800 leading-tight">{produto.nome}</h3>
-          </div>
-          <button onClick={onFechar} className="text-gray-400 hover:text-gray-600 p-1">
-            <X size={20} />
-          </button>
-        </div>
-
-        {produto.preco_env && (
-          <p className="text-sm text-gray-500 mb-4">
-            Preço/env: <span className="font-bold text-primary">R$ {produto.preco_env.toFixed(2)}</span>
-          </p>
-        )}
-
-        <div className="flex items-center justify-center gap-6 my-6">
-          <button
-            onClick={() => ajustar(-1)}
-            className="w-12 h-12 rounded-full border-2 border-primary flex items-center justify-center text-primary"
-          >
-            <Minus size={20} />
-          </button>
-          <input
-            type="number"
-            value={quantidade}
-            min={1}
-            onChange={e => setQuantidade(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-20 text-center text-2xl font-bold text-gray-800 border-b-2 border-primary bg-transparent focus:outline-none"
-          />
-          <button
-            onClick={() => ajustar(1)}
-            className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-
-        <Button
-          larguraTotal
-          onClick={() => onConfirmar(quantidade)}
-          className="h-12"
-        >
-          Adicionar ao pedido
-        </Button>
+      <div className="flex gap-3 mt-3">
+        <div className="h-4 bg-gray-200 rounded w-16" />
+        <div className="h-4 bg-gray-200 rounded w-16" />
       </div>
     </div>
   )
@@ -86,7 +24,8 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
   const [produtos, setProdutos] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [busca, setBusca] = useState('')
-  const [produtoModal, setProdutoModal] = useState(null)
+  const [produtoExpandido, setProdutoExpandido] = useState(null)
+  const [quantidade, setQuantidade] = useState(1)
 
   useEffect(() => {
     async function buscarProdutos() {
@@ -95,7 +34,6 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
           .from('produtos')
           .select('*')
           .order('nome')
-
         if (error) throw error
         setProdutos(data || [])
       } catch (err) {
@@ -105,7 +43,6 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
         setCarregando(false)
       }
     }
-
     buscarProdutos()
   }, [])
 
@@ -122,112 +59,172 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
     return item?.quantidade || 0
   }
 
-  function handleConfirmarQuantidade(quantidade) {
-    onAdicionarItem(produtoModal, quantidade)
-    setProdutoModal(null)
+  function handleAbrirExpandido(produto) {
+    if (produtoExpandido?.id === produto.id) {
+      setProdutoExpandido(null)
+    } else {
+      setProdutoExpandido(produto)
+      setQuantidade(getQuantidadeNoCarrinho(produto.id) || 1)
+    }
+  }
+
+  function handleConfirmarQuantidade() {
+    onAdicionarItem(produtoExpandido, quantidade)
+    setProdutoExpandido(null)
+  }
+
+  function ajustar(delta) {
+    setQuantidade(prev => Math.max(1, prev + delta))
   }
 
   const totalItens = itens.reduce((acc, i) => acc + i.quantidade, 0)
+  const totalValor = itens.reduce((acc, i) => acc + i.produto.preco_env * i.quantidade, 0)
+  const totalFormatado = totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col step-transicao">
-      <div className="bg-primary px-4 pt-12 pb-4 sticky top-0 z-10">
-        <h1 className="text-white text-xl font-bold mb-3">Selecionar Produtos</h1>
+    <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
+      <div className="px-4 pt-5 pb-3 bg-bg">
+        <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
+          Produtos de Interesse
+        </h1>
+        <p className="text-[14px] text-gray-400 mb-4">
+          Selecione os probióticos e informe a quantidade desejada.
+        </p>
         <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search
+            size={17}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
           <input
             type="search"
             value={busca}
             onChange={e => setBusca(e.target.value)}
             placeholder="Buscar por nome ou código..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50 text-sm"
+            className="w-full pl-10 pr-4 py-[11px] rounded-xl border-[1.5px] border-border bg-surface text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary transition-colors duration-150"
           />
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-4 pb-28 flex flex-col gap-3">
+      <div className={`flex-1 px-4 py-3 flex flex-col gap-3 ${totalItens > 0 ? 'pb-28' : 'pb-6'}`}>
         {carregando ? (
-          Array.from({ length: 6 }).map((_, i) => <SkeletonProduto key={i} />)
+          Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
         ) : produtosFiltrados.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <p className="text-lg font-medium">Nenhum produto encontrado</p>
-            <p className="text-sm mt-1">Tente outro termo de busca</p>
+          <div className="text-center py-12 text-gray-400">
+            <p className="text-[15px] font-medium">Nenhum produto encontrado</p>
+            <p className="text-[13px] mt-1">Tente outro termo de busca</p>
           </div>
         ) : (
           produtosFiltrados.map(produto => {
             const qtdCarrinho = getQuantidadeNoCarrinho(produto.id)
             const semPreco = !produto.preco_env
+            const expandido = produtoExpandido?.id === produto.id
 
             return (
-              <button
-                key={produto.id}
-                onClick={() => !semPreco && setProdutoModal(produto)}
-                disabled={semPreco}
-                className={`
-                  bg-white rounded-xl border p-4 text-left transition-all duration-150 w-full
-                  ${semPreco
-                    ? 'border-gray-100 opacity-60 cursor-not-allowed'
-                    : qtdCarrinho > 0
-                    ? 'border-primary shadow-md'
-                    : 'border-gray-100 hover:border-gray-200 hover:shadow-sm active:shadow-md'
-                  }
-                `}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2 flex-1 min-w-0">
-                    <Badge variante="default" className="flex-shrink-0 mt-0.5">{produto.codigo}</Badge>
-                    <span className="text-sm font-medium text-gray-800 leading-tight">{produto.nome}</span>
+              <div key={produto.id}>
+                <button
+                  onClick={() => !semPreco && handleAbrirExpandido(produto)}
+                  disabled={semPreco}
+                  className={`
+                    w-full bg-surface rounded-xl border-[1.5px] p-[14px] text-left
+                    transition-all duration-150
+                    ${semPreco
+                      ? 'border-border opacity-45 cursor-not-allowed'
+                      : qtdCarrinho > 0 || expandido
+                      ? 'border-primary'
+                      : 'border-border hover:border-gray-300'
+                    }
+                  `}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] font-semibold text-gray-500 flex-shrink-0">
+                          {produto.codigo}
+                        </span>
+                        {semPreco && (
+                          <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] text-gray-400">
+                            Indisponível
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[13px] font-medium text-gray-900 leading-[1.4] line-clamp-2">
+                        {produto.nome}
+                      </p>
+                    </div>
+                    {qtdCarrinho > 0 && (
+                      <span className="flex-shrink-0 inline-flex items-center px-2 py-[2px] rounded-full bg-primary text-[11px] font-semibold text-white">
+                        {qtdCarrinho}x
+                      </span>
+                    )}
                   </div>
-                  {qtdCarrinho > 0 && (
-                    <Badge variante="primary" className="flex-shrink-0">
-                      {qtdCarrinho}x
-                    </Badge>
-                  )}
-                  {semPreco && (
-                    <Badge variante="warning" className="flex-shrink-0">Sem preço</Badge>
-                  )}
-                </div>
 
-                {!semPreco && (
-                  <div className="flex gap-4 mt-2 pt-2 border-t border-gray-50">
-                    {produto.preco_g && (
-                      <span className="text-xs text-gray-500">
-                        /g: <span className="font-semibold text-gray-700">R$ {produto.preco_g.toFixed(2)}</span>
-                      </span>
-                    )}
-                    {produto.preco_env && (
-                      <span className="text-xs text-gray-500">
-                        /env: <span className="font-semibold text-primary">R$ {produto.preco_env.toFixed(2)}</span>
-                      </span>
-                    )}
+                  {!semPreco && (
+                    <div className="flex gap-4 mt-2 pt-2 border-t border-gray-100">
+                      {produto.preco_g && (
+                        <span className="text-[13px] font-semibold text-gray-700">
+                          R$ {produto.preco_g.toFixed(2)}
+                          <span className="text-[11px] font-normal text-gray-400"> /g</span>
+                        </span>
+                      )}
+                      {produto.preco_env && (
+                        <span className="text-[13px] font-semibold text-gray-700">
+                          R$ {produto.preco_env.toFixed(2)}
+                          <span className="text-[11px] font-normal text-gray-400"> /env</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+
+                {expandido && (
+                  <div className="bg-surface border border-border rounded-xl mt-1 p-4 shadow-card-elevated slide-down">
+                    <p className="text-[13px] font-medium text-gray-700 mb-3">
+                      Quantos envelopes?
+                    </p>
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                      <button
+                        onClick={() => ajustar(-1)}
+                        className="w-10 h-10 rounded-full border-[1.5px] border-primary flex items-center justify-center text-primary"
+                      >
+                        <Minus size={18} />
+                      </button>
+                      <input
+                        type="number"
+                        value={quantidade}
+                        min={1}
+                        onChange={e => setQuantidade(Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-12 text-center text-[20px] font-semibold text-gray-900 border-b-2 border-primary bg-transparent focus:outline-none"
+                      />
+                      <button
+                        onClick={() => ajustar(1)}
+                        className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white"
+                      >
+                        <Plus size={18} />
+                      </button>
+                    </div>
+                    <button
+                      onClick={handleConfirmarQuantidade}
+                      className="w-full h-10 rounded-xl bg-primary text-white text-[14px] font-semibold hover:bg-primary-hover transition-colors duration-150"
+                    >
+                      Adicionar ao pedido
+                    </button>
                   </div>
                 )}
-              </button>
+              </div>
             )
           })
         )}
       </div>
 
       {totalItens > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-2 bg-surface border-t border-gray-100">
-          <Button
-            larguraTotal
+        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-3 bg-surface border-t border-border">
+          <button
             onClick={onVerCarrinho}
-            className="h-14 text-base"
+            className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"
           >
-            <ShoppingCart size={20} />
-            Ver carrinho ({totalItens} {totalItens === 1 ? 'item' : 'itens'})
-          </Button>
+            Revisar pedido · {totalItens} {totalItens === 1 ? 'produto' : 'produtos'} · {totalFormatado}
+          </button>
         </div>
-      )}
-
-      {produtoModal && (
-        <ModalQuantidade
-          produto={produtoModal}
-          quantidadeAtual={getQuantidadeNoCarrinho(produtoModal.id)}
-          onConfirmar={handleConfirmarQuantidade}
-          onFechar={() => setProdutoModal(null)}
-        />
       )}
     </div>
   )
