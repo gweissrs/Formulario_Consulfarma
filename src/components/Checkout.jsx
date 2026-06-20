@@ -32,16 +32,16 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
     let timestampLocal = payloadPedido.timestamp
 
     try {
-      const { data: clienteData, error: clienteError } = await supabase
+      const clienteId = crypto.randomUUID()
+      const { error: clienteError } = await supabase
         .from('clientes')
         .insert({
+          id: clienteId,
           razao_social: pedido.cliente.razaoSocial,
           cnpj: pedido.cliente.cnpj,
           email: pedido.cliente.email,
           whatsapp: pedido.cliente.whatsapp,
         })
-        .select('id')
-        .single()
 
       if (clienteError) throw clienteError
 
@@ -49,30 +49,28 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
       let atendenteId = pedido.atendente.id
 
       if (!uuidRegex.test(atendenteId)) {
-        const { data: atendenteData, error: atendenteError } = await supabase
+        atendenteId = crypto.randomUUID()
+        const { error: atendenteError } = await supabase
           .from('atendentes')
-          .insert({ nome: pedido.atendente.nome })
-          .select('id')
-          .single()
+          .insert({ id: atendenteId, nome: pedido.atendente.nome })
         if (atendenteError) throw atendenteError
-        atendenteId = atendenteData.id
       }
 
-      const { data: pedidoData, error: pedidoError } = await supabase
+      const pedidoId = crypto.randomUUID()
+      const { error: pedidoError } = await supabase
         .from('pedidos')
         .insert({
-          cliente_id: clienteData.id,
+          id: pedidoId,
+          cliente_id: clienteId,
           atendente_id: atendenteId,
           valor_total: valorTotal,
           status: 'pendente',
         })
-        .select('id')
-        .single()
 
       if (pedidoError) throw pedidoError
 
       const itens = pedido.itens.map(item => ({
-        pedido_id: pedidoData.id,
+        pedido_id: pedidoId,
         produto_id: item.produto.id,
         quantidade: item.quantidade,
         preco_unitario: item.produto.preco_env,
@@ -87,7 +85,7 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
 
       try {
         await supabase.functions.invoke('notify-pedido', {
-          body: { ...payloadPedido, pedidoId: pedidoData.id },
+          body: { ...payloadPedido, pedidoId },
         })
       } catch {
         // Falha no email não bloqueia o fluxo
