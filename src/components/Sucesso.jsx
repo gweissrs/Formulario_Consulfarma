@@ -9,7 +9,7 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
 
   return (
     <div className="min-h-screen bg-bg flex flex-col step-transicao">
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 w-full max-w-2xl mx-auto">
         <div
           className="w-16 h-16 rounded-full flex items-center justify-center mb-6 check-pop"
           style={{ backgroundColor: '#16A34A' }}
@@ -62,7 +62,7 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
         </div>
       </div>
 
-      <div className="px-4 pb-8 pt-2 flex flex-col gap-3">
+      <div className="w-full max-w-2xl mx-auto px-4 pb-8 pt-2 flex flex-col gap-3">
         <button
           onClick={onNovoPedido}
           className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"

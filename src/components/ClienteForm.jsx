@@ -100,7 +100,7 @@ export function ClienteForm({ onConfirmar, atendente }) {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
-      <div className="flex-1 px-4 py-6 flex flex-col gap-4">
+      <div className="flex-1 w-full max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">
         <div className="mb-2">
           <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
             Dados do Cliente
@@ -155,7 +155,7 @@ export function ClienteForm({ onConfirmar, atendente }) {
         />
       </div>
 
-      <div className="px-4 pb-8 pt-2">
+      <div className="w-full max-w-2xl mx-auto px-4 pb-8 pt-2">
         <button
           onClick={handleSubmit}
           disabled={!tudoPreenchido}

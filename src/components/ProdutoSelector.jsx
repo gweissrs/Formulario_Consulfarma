@@ -83,7 +83,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
-      <div className="px-4 pt-5 pb-3 bg-bg">
+      <div className="w-full max-w-2xl mx-auto px-4 pt-5 pb-3">
         <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
           Produtos de Interesse
         </h1>
@@ -105,7 +105,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
         </div>
       </div>
 
-      <div className={`flex-1 px-4 py-3 flex flex-col gap-3 ${totalItens > 0 ? 'pb-28' : 'pb-6'}`}>
+      <div className={`flex-1 w-full max-w-2xl mx-auto px-4 py-3 flex flex-col gap-3 ${totalItens > 0 ? 'pb-28' : 'pb-6'}`}>
         {carregando ? (
           Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
         ) : produtosFiltrados.length === 0 ? (
@@ -217,13 +217,15 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
       </div>
 
       {totalItens > 0 && (
-        <div className="fixed-bottom-bar px-4 pb-6 pt-3 bg-surface border-t border-border">
-          <button
-            onClick={onVerCarrinho}
-            className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"
-          >
-            Revisar pedido · {totalItens} {totalItens === 1 ? 'produto' : 'produtos'} · {totalFormatado}
-          </button>
+        <div className="fixed-bottom-bar bg-surface border-t border-border">
+          <div className="max-w-2xl mx-auto px-4 pb-6 pt-3">
+            <button
+              onClick={onVerCarrinho}
+              className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"
+            >
+              Revisar pedido · {totalItens} {totalItens === 1 ? 'produto' : 'produtos'} · {totalFormatado}
+            </button>
+          </div>
         </div>
       )}
     </div>
