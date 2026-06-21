@@ -48,11 +48,20 @@ export async function syncPedidosPendentes() {
 
       let atendenteId = pedido.atendente.id
       if (!UUID_REGEX.test(atendenteId)) {
-        atendenteId = crypto.randomUUID()
-        const { error: atendenteError } = await supabase
+        const { data: existente } = await supabase
           .from('atendentes')
-          .insert({ id: atendenteId, nome: pedido.atendente.nome })
-        if (atendenteError) throw atendenteError
+          .select('id')
+          .eq('nome', pedido.atendente.nome)
+          .maybeSingle()
+        if (existente) {
+          atendenteId = existente.id
+        } else {
+          atendenteId = crypto.randomUUID()
+          const { error: atendenteError } = await supabase
+            .from('atendentes')
+            .insert({ id: atendenteId, nome: pedido.atendente.nome })
+          if (atendenteError) throw atendenteError
+        }
       }
 
       const pedidoId = crypto.randomUUID()
@@ -82,7 +91,8 @@ export async function syncPedidosPendentes() {
 
       removerPedidoLocal(pedido.timestamp)
       sincronizados++
-    } catch {
+    } catch (err) {
+      console.error('[sync] falha ao sincronizar pedido:', err)
       break
     }
   }

@@ -36,7 +36,7 @@ export default function App() {
   } = usePedido()
 
   useEffect(() => {
-    const handleOnline = async () => {
+    async function tentarSync() {
       const resultado = await syncPedidosPendentes()
       if (resultado.sincronizados > 0) {
         toast.success(
@@ -44,16 +44,34 @@ export default function App() {
           { duration: 4000 }
         )
       }
+      if (resultado.pendentes > 0) {
+        toast.error(
+          `${resultado.pendentes} pedido(s) não puderam ser sincronizados. Tente novamente.`,
+          { duration: 6000 }
+        )
+      }
+    }
+
+    function handleOnline() {
+      tentarSync()
+    }
+
+    function handleVisibility() {
+      if (document.visibilityState === 'visible' && navigator.onLine) {
+        tentarSync()
+      }
     }
 
     window.addEventListener('online', handleOnline)
+    document.addEventListener('visibilitychange', handleVisibility)
 
     if (navigator.onLine) {
-      syncPedidosPendentes()
+      tentarSync()
     }
 
     return () => {
       window.removeEventListener('online', handleOnline)
+      document.removeEventListener('visibilitychange', handleVisibility)
     }
   }, [])
 
