@@ -97,6 +97,12 @@ export async function syncPedidosPendentes() {
         .insert(itens)
       if (itensError) throw itensError
 
+      try {
+        await supabase.functions.invoke('notify-pedido', {
+          body: { ...pedido, pedidoId },
+        })
+      } catch {}
+
       removerPedidoLocal(pedido.timestamp)
       sincronizados++
     } catch (err) {
