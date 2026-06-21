@@ -76,7 +76,6 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
           Trocar atendente
         </button>
       </div>
-      <div className="h-14" />
     </div>
   )
 }

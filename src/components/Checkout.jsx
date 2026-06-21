@@ -230,7 +230,6 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
           )}
         </button>
       </div>
-      <div className="h-14" />
     </div>
   )
 }

@@ -169,7 +169,6 @@ export function ClienteForm({ onConfirmar, atendente }) {
           Avançar para produtos →
         </button>
       </div>
-      <div className="h-14" />
     </div>
   )
 }

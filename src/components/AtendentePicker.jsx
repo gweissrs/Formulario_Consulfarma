@@ -70,7 +70,6 @@ export function AtendentePicker({ onConfirmar }) {
           Confirmar e continuar →
         </button>
       </div>
-      <div className="h-14" />
     </div>
   )
 }

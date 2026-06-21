@@ -69,7 +69,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
         </div>
       </div>
 
-      <div className={`flex-1 w-full max-w-2xl mx-auto px-4 py-3 flex flex-col gap-3 ${totalItens > 0 ? 'pb-36' : 'pb-20'}`}>
+      <div className={`flex-1 w-full max-w-2xl mx-auto px-4 py-3 flex flex-col gap-3 ${totalItens > 0 ? 'pb-28' : 'pb-6'}`}>
         {produtosFiltrados.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <p className="text-[15px] font-medium">Nenhum produto encontrado</p>
@@ -182,7 +182,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
 
       {totalItens > 0 && (
         <div className="fixed-bottom-bar bg-surface border-t border-border">
-          <div className="max-w-2xl mx-auto px-4 pb-16 pt-3">
+          <div className="max-w-2xl mx-auto px-4 pb-6 pt-3">
             <button
               onClick={onVerCarrinho}
               className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"

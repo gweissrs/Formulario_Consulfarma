@@ -10,7 +10,6 @@ import { ClienteForm } from '../components/ClienteForm'
 import { ProdutoSelector } from '../components/ProdutoSelector'
 import { Checkout } from '../components/Checkout'
 import { Sucesso } from '../components/Sucesso'
-import { Footer } from '../components/Footer'
 
 const STEPS = {
   INTRO: 0,
@@ -116,7 +115,6 @@ export default function App() {
   }
 
   const mostrarProgressBar = step >= STEPS.ATENDENTE && step <= STEPS.CHECKOUT
-  const mostrarFooter = step >= STEPS.ATENDENTE
 
   return (
     <>
@@ -128,8 +126,6 @@ export default function App() {
           onVoltar={step > STEPS.ATENDENTE ? handleVoltar : null}
         />
       )}
-
-      {mostrarFooter && <Footer />}
 
       {step === STEPS.INTRO && (
         <IntroAnimation onComplete={handleIntroCompleto} />
