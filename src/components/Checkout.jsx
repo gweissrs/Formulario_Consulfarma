@@ -142,7 +142,7 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
                   </div>
                   {produto.desconto && (
                     <p className="text-[12px] mb-2" style={{ color: '#16A34A' }}>
-                      Desconto de 10% aplicado — economia de {formatarMoeda((produto.preco_original - produto.preco_env) * quantidade)}
+                      Desconto de 10% aplicado — economia de {formatarMoeda(produto.preco_env * 0.1 * quantidade)}
                     </p>
                   )}
                   <div className="flex items-center justify-between">
@@ -190,7 +190,7 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
           {(() => {
             const economiaTotal = pedido.itens
               .filter(({ produto }) => produto.desconto)
-              .reduce((acc, { produto, quantidade }) => acc + (produto.preco_original - produto.preco_env) * quantidade, 0)
+              .reduce((acc, { produto, quantidade }) => acc + produto.preco_env * 0.1 * quantidade, 0)
             return economiaTotal > 0 ? (
               <div className="flex justify-between items-center mb-3 pb-3 border-b border-accent/30">
                 <span className="text-[12px] text-gray-700">Economia total na feira:</span>
