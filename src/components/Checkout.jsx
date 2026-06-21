@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
-import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
 import { salvarPedidoLocal } from '../lib/offline'
 
@@ -90,12 +89,8 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
       onSucesso({ offline: false })
     } catch (err) {
       console.error('Erro ao enviar pedido:', err)
-      if (!navigator.onLine) {
-        salvarPedidoLocal(payloadPedido)
-        onSucesso({ offline: true })
-      } else {
-        toast.error('Erro ao enviar pedido. Verifique a conexão e tente novamente.', { duration: 5000 })
-      }
+      salvarPedidoLocal(payloadPedido)
+      onSucesso({ offline: !navigator.onLine })
     } finally {
       setEnviando(false)
     }
