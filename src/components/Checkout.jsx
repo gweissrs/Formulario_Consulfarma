@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
-import { salvarPedidoLocal, removerPedidoLocal } from '../lib/offline'
+import { salvarPedidoLocal } from '../lib/offline'
 
 function formatarMoeda(valor) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -26,10 +26,6 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
       valorTotal,
       criadoEm: new Date().toISOString(),
     }
-
-    salvarPedidoLocal(payloadPedido)
-
-    let timestampLocal = payloadPedido.timestamp
 
     try {
       const clienteId = crypto.randomUUID()
@@ -91,15 +87,10 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
         // Falha no email não bloqueia o fluxo
       }
 
-      removerPedidoLocal(timestampLocal)
       onSucesso({ offline: false })
     } catch (err) {
       console.error('Erro ao enviar pedido:', err)
-      toast('Pedido salvo localmente. Será sincronizado quando a conexão retornar.', {
-        icon: '⚠️',
-        style: { background: '#FEF3C7', color: '#92400E' },
-        duration: 5000,
-      })
+      salvarPedidoLocal(payloadPedido)
       onSucesso({ offline: true })
     } finally {
       setEnviando(false)

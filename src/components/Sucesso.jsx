@@ -24,7 +24,7 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
           Nossa equipe entrará em contato em breve.
         </p>
 
-        {offline && (
+        {offline === true && (
           <div className="flex items-start gap-3 mt-5 w-full max-w-sm bg-[#FFF8E1] border border-accent rounded-xl p-3">
             <WifiOff size={18} className="text-accent flex-shrink-0 mt-0.5" />
             <p className="text-[13px] text-gray-700">
