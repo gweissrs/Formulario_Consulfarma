@@ -26,9 +26,17 @@ export function limparPedidosPendentes() {
   localStorage.removeItem(STORAGE_KEY)
 }
 
+let _syncEmAndamento = false
+
 export async function syncPedidosPendentes() {
+  if (_syncEmAndamento) return { sincronizados: 0, pendentes: getPedidosPendentes().length }
+  _syncEmAndamento = true
+
   const pendentes = getPedidosPendentes()
-  if (pendentes.length === 0) return { sincronizados: 0, pendentes: 0 }
+  if (pendentes.length === 0) {
+    _syncEmAndamento = false
+    return { sincronizados: 0, pendentes: 0 }
+  }
 
   let sincronizados = 0
 
@@ -93,9 +101,11 @@ export async function syncPedidosPendentes() {
       sincronizados++
     } catch (err) {
       console.error('[sync] falha ao sincronizar pedido:', err)
+      _syncEmAndamento = false
       break
     }
   }
 
+  _syncEmAndamento = false
   return { sincronizados, pendentes: getPedidosPendentes().length }
 }
