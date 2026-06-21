@@ -140,6 +140,11 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
                       {formatarMoeda(subtotal)}
                     </p>
                   </div>
+                  {produto.desconto && (
+                    <p className="text-[12px] mb-2" style={{ color: '#16A34A' }}>
+                      Desconto de 10% aplicado — economia de {formatarMoeda((produto.preco_original - produto.preco_env) * quantidade)}
+                    </p>
+                  )}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] font-semibold text-gray-500">
@@ -182,6 +187,17 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
 
         {/* Total */}
         <div className="bg-[#FDF5F5] border border-accent rounded-xl p-4">
+          {(() => {
+            const economiaTotal = pedido.itens
+              .filter(({ produto }) => produto.desconto)
+              .reduce((acc, { produto, quantidade }) => acc + (produto.preco_original - produto.preco_env) * quantidade, 0)
+            return economiaTotal > 0 ? (
+              <div className="flex justify-between items-center mb-3 pb-3 border-b border-accent/30">
+                <span className="text-[12px] text-gray-700">Economia total na feira:</span>
+                <span className="text-[13px] font-semibold" style={{ color: '#16A34A' }}>{formatarMoeda(economiaTotal)}</span>
+              </div>
+            ) : null
+          })()}
           <p className="text-[13px] text-gray-700 mb-1">Valor estimado do pedido</p>
           <p className="font-sans text-[32px] font-bold text-primary leading-none">
             {formatarMoeda(valorTotal)}

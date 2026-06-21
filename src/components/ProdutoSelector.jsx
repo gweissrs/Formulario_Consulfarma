@@ -100,6 +100,11 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
                         <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] font-semibold text-gray-500 flex-shrink-0">
                           {produto.codigo}
                         </span>
+                        {produto.desconto && (
+                          <span className="inline-flex items-center px-[7px] py-[2px] rounded text-[11px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: '#F5A800' }}>
+                            10% OFF
+                          </span>
+                        )}
                         {semPreco && (
                           <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] text-gray-400">
                             Indisponível
@@ -118,16 +123,20 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
                   </div>
 
                   {!semPreco && (
-                    <div className="flex gap-4 mt-2 pt-2 border-t border-gray-100">
-                      {produto.preco_g && (
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-gray-100">
+                      {produto.desconto ? (
+                        <>
+                          <span className="text-[11px] font-normal text-gray-400 line-through">
+                            {produto.preco_original.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                          </span>
+                          <span className="text-[13px] font-semibold" style={{ color: '#8B2020' }}>
+                            {produto.preco_env.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                            <span className="text-[11px] font-normal"> /env</span>
+                          </span>
+                        </>
+                      ) : (
                         <span className="text-[13px] font-semibold text-gray-700">
-                          R$ {produto.preco_g.toFixed(2)}
-                          <span className="text-[11px] font-normal text-gray-400"> /g</span>
-                        </span>
-                      )}
-                      {produto.preco_env && (
-                        <span className="text-[13px] font-semibold text-gray-700">
-                          R$ {produto.preco_env.toFixed(2)}
+                          {produto.preco_env.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                           <span className="text-[11px] font-normal text-gray-400"> /env</span>
                         </span>
                       )}
