@@ -126,23 +126,16 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
                   </div>
 
                   {!semPreco && (
-                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-gray-100">
-                      {produto.desconto ? (
-                        <>
-                          <span className="text-[11px] font-normal text-gray-400 line-through">
-                            {produto.preco_original.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                          </span>
-                          <span className="text-[13px] font-semibold" style={{ color: '#8B2020' }}>
-                            {produto.preco_env.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            <span className="text-[11px] font-normal"> /env</span>
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-[13px] font-semibold text-gray-700">
-                          {produto.preco_env.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                          <span className="text-[11px] font-normal text-gray-400"> /env</span>
-                        </span>
-                      )}
+                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                      <span className="text-[12px] font-semibold" style={{ color: '#374151' }}>
+                        {produto.preco_g.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        <span className="text-[11px] font-normal" style={{ color: '#9CA3AF' }}> /g</span>
+                      </span>
+                      <span className="text-[12px]" style={{ color: '#D1D5DB' }}>·</span>
+                      <span className="text-[13px] font-semibold" style={{ color: '#111827' }}>
+                        {produto.preco_env.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        <span className="text-[11px] font-normal" style={{ color: '#9CA3AF' }}> /env</span>
+                      </span>
                     </div>
                   )}
                 </button>
