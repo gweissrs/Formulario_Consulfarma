@@ -39,7 +39,7 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
           </p>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between text-[13px]">
-              <span className="text-gray-500">Atendente</span>
+              <span className="text-gray-500">Vendedor</span>
               <span className="font-medium text-gray-900">{pedido.atendente?.nome}</span>
             </div>
             <div className="flex justify-between text-[13px]">
@@ -67,13 +67,13 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
           onClick={onNovoPedido}
           className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"
         >
-          Novo pedido com mesmo atendente
+          Novo pedido com mesmo vendedor
         </button>
         <button
           onClick={onTrocarAtendente}
           className="w-full h-12 rounded-xl bg-surface border-[1.5px] border-primary text-primary font-medium text-[14px] hover:bg-red-50 transition-colors duration-150"
         >
-          Trocar atendente
+          Trocar vendedor
         </button>
       </div>
     </div>

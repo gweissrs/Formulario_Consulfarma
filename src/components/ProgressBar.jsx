@@ -1,7 +1,7 @@
 import { ChevronLeft } from 'lucide-react'
 
 const NOMES_STEPS = {
-  1: 'Identificação do Atendente',
+  1: 'Identificação do Vendedor',
   2: 'Dados do Cliente',
   3: 'Seleção de Produtos',
   4: 'Revisão do Pedido',
