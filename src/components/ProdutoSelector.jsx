@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Search, Plus, Minus } from 'lucide-react'
+import { Search, Plus, Minus, WifiOff } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+
+const CACHE_KEY = 'coana_produtos_cache'
+const CACHE_AT_KEY = 'coana_produtos_cache_at'
+const CACHE_TTL = 24 * 60 * 60 * 1000
 
 function SkeletonCard() {
   return (
@@ -26,25 +30,56 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
   const [busca, setBusca] = useState('')
   const [produtoExpandido, setProdutoExpandido] = useState(null)
   const [quantidade, setQuantidade] = useState(1)
+  const [usandoCache, setUsandoCache] = useState(false)
+  const [erroCritico, setErroCritico] = useState(false)
+  const [tentativa, setTentativa] = useState(0)
 
   useEffect(() => {
+    setCarregando(true)
+    setErroCritico(false)
+    setUsandoCache(false)
+
     async function buscarProdutos() {
+      try {
+        const cacheAt = localStorage.getItem(CACHE_AT_KEY)
+        const cacheData = localStorage.getItem(CACHE_KEY)
+        if (cacheAt && cacheData && Date.now() - parseInt(cacheAt) < CACHE_TTL) {
+          setProdutos(JSON.parse(cacheData))
+          setCarregando(false)
+          return
+        }
+      } catch {}
+
       try {
         const { data, error } = await supabase
           .from('produtos')
           .select('*')
           .order('nome')
         if (error) throw error
-        setProdutos(data || [])
+        const lista = data || []
+        setProdutos(lista)
+        localStorage.setItem(CACHE_KEY, JSON.stringify(lista))
+        localStorage.setItem(CACHE_AT_KEY, Date.now().toString())
       } catch (err) {
         console.error('Erro ao buscar produtos:', err)
-        setProdutos([])
+        try {
+          const cacheData = localStorage.getItem(CACHE_KEY)
+          if (cacheData) {
+            setProdutos(JSON.parse(cacheData))
+            setUsandoCache(true)
+          } else {
+            setErroCritico(true)
+          }
+        } catch {
+          setErroCritico(true)
+        }
       } finally {
         setCarregando(false)
       }
     }
+
     buscarProdutos()
-  }, [])
+  }, [tentativa])
 
   const produtosFiltrados = produtos.filter(p => {
     const termo = busca.toLowerCase()
@@ -106,7 +141,28 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
       </div>
 
       <div className={`flex-1 w-full max-w-2xl mx-auto px-4 py-3 flex flex-col gap-3 ${totalItens > 0 ? 'pb-28' : 'pb-6'}`}>
-        {carregando ? (
+        {usandoCache && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#FEF9E7] border border-[#F5A800]/30">
+            <WifiOff size={14} className="text-gray-400 flex-shrink-0" />
+            <span style={{ fontSize: '12px', color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
+              Exibindo produtos salvos localmente.
+            </span>
+          </div>
+        )}
+        {erroCritico ? (
+          <div className="text-center py-12 flex flex-col items-center gap-4">
+            <WifiOff size={32} className="text-gray-300" />
+            <p className="text-[14px] text-gray-500 max-w-xs">
+              Sem conexão e sem dados salvos. Conecte-se à internet para carregar os produtos.
+            </p>
+            <button
+              onClick={() => setTentativa(t => t + 1)}
+              className="px-4 py-2 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary-hover transition-colors"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        ) : carregando ? (
           Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
         ) : produtosFiltrados.length === 0 ? (
           <div className="text-center py-12 text-gray-400">

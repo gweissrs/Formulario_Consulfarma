@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { usePedido } from '../hooks/usePedido'
+import { syncPedidosPendentes, getPedidosPendentes } from '../lib/offline'
 import { IntroAnimation } from '../components/IntroAnimation'
 import { ProgressBar } from '../components/ProgressBar'
 import { AtendentePicker } from '../components/AtendentePicker'
@@ -32,6 +34,24 @@ export default function App() {
     resetarMantendoAtendente,
     valorTotal,
   } = usePedido()
+
+  useEffect(() => {
+    async function tentarSync() {
+      if (!navigator.onLine) return
+      if (getPedidosPendentes().length === 0) return
+      const { sincronizados } = await syncPedidosPendentes()
+      if (sincronizados > 0) {
+        toast.success(
+          `${sincronizados} pedido${sincronizados > 1 ? 's' : ''} sincronizado${sincronizados > 1 ? 's' : ''} com sucesso.`,
+          { duration: 4000 }
+        )
+      }
+    }
+
+    tentarSync()
+    window.addEventListener('online', tentarSync)
+    return () => window.removeEventListener('online', tentarSync)
+  }, [])
 
   const handleIntroCompleto = useCallback(() => {
     setStep(STEPS.ATENDENTE)
