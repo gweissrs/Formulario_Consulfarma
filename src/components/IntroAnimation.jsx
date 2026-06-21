@@ -24,14 +24,14 @@ export function IntroAnimation({ onComplete }) {
           onError={e => { e.target.style.display = 'none' }}
         />
         <h1
-          className="text-center"
-          style={{ fontFamily: "'Playfair Display', serif", fontSize: '28px', fontWeight: 700, color: '#8B2020', letterSpacing: '0.02em', marginTop: '20px' }}
+          className="font-sans text-center uppercase"
+          style={{ fontSize: '26px', fontWeight: 800, color: '#8B2020', letterSpacing: '0.08em', marginTop: '20px' }}
         >
           COANA
         </h1>
         <p
           className="font-sans text-center"
-          style={{ fontSize: '13px', fontWeight: 400, color: '#8B2020', letterSpacing: '0.01em', marginTop: '4px' }}
+          style={{ fontSize: '12px', fontWeight: 400, color: '#8B2020', letterSpacing: '0.01em', marginTop: '4px' }}
         >
           Soluções em Probióticos
         </p>
