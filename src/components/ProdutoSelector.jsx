@@ -24,6 +24,9 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
     if (produtoExpandido?.id === produto.id) {
       setProdutoExpandido(null)
     } else {
+      if (produtoExpandido) {
+        onAdicionarItem(produtoExpandido, quantidade)
+      }
       setProdutoExpandido(produto)
       setQuantidade(getQuantidadeNoCarrinho(produto.id) || 1)
     }
