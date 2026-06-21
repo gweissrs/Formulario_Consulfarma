@@ -90,8 +90,12 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
       onSucesso({ offline: false })
     } catch (err) {
       console.error('Erro ao enviar pedido:', err)
-      salvarPedidoLocal(payloadPedido)
-      onSucesso({ offline: true })
+      if (!navigator.onLine) {
+        salvarPedidoLocal(payloadPedido)
+        onSucesso({ offline: true })
+      } else {
+        toast.error('Erro ao enviar pedido. Verifique a conexão e tente novamente.', { duration: 5000 })
+      }
     } finally {
       setEnviando(false)
     }
