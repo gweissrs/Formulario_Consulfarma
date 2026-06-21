@@ -1,6 +1,6 @@
 # Sistema de Pedidos COANA — Consulfarma 2026
 
-> Aplicação web mobile-first desenvolvida para operação em campo durante a **Consulfarma 2026** (Anhembi, São Paulo — 2 a 4 de julho de 2026), permitindo que 8 atendentes simultâneos registrem pedidos de clientes B2B em tempo real, com notificação automática por email e resiliência offline.
+> Aplicação web mobile-first desenvolvida para operação em campo durante a **Consulfarma 2026** (Anhembi, São Paulo — 2 a 4 de julho de 2026), permitindo que atendentes simultâneos registrem pedidos de clientes B2B em tempo real, com notificação automática por email e resiliência offline.
 
 ---
 
@@ -17,42 +17,46 @@ Não há processamento de pagamentos nem emissão de notas. O objetivo é único
 ### Frontend — React 18 + Vite
 
 **Por que React?**
-React foi escolhido pela maturidade do ecossistema, facilidade de composição de componentes e performance com renderizações granulares. O Vite substitui o Create React App por oferecer HMR (Hot Module Replacement) praticamente instantâneo e build significativamente mais rápido — crítico para iterações rápidas no dia a dia de desenvolvimento.
+React foi escolhido pela maturidade do ecossistema, facilidade de composição de componentes e performance com renderizações granulares. O Vite substitui o Create React App por oferecer HMR (Hot Module Replacement) praticamente instantâneo e build significativamente mais rápido.
 
-**Por que sem Context API ou gerenciador de estado externo (Redux, Zustand)?**
-O fluxo da aplicação é estritamente linear: `Intro → Atendente → Cliente → Produtos → Checkout → Sucesso`. Com apenas 6 telas e estado concentrado em um único hook (`usePedido`), introduzir Context ou Redux seria over-engineering. O estado é passado via props, tornando o fluxo de dados 100% rastreável e previsível sem abstrações desnecessárias.
+**Por que sem Context API ou gerenciador de estado externo?**
+O fluxo da aplicação é estritamente linear: `Intro → Atendente → Cliente → Produtos → Checkout → Sucesso`. Com apenas 6 telas e estado concentrado em um único hook (`usePedido`), introduzir Context ou Redux seria over-engineering. O estado é passado via props, tornando o fluxo de dados 100% rastreável e previsível.
 
 ### Estilização — Tailwind CSS v3
 
 **Por que Tailwind?**
-Tailwind elimina a alternância mental entre arquivo JSX e CSS. Em ambiente mobile-first e de iteração visual rápida, escrever classes diretamente no JSX acelera o ciclo de design-implementação em 3-4x. O purge automático garante que o bundle final contenha apenas as classes utilizadas.
+Tailwind elimina a alternância mental entre arquivo JSX e CSS. Em ambiente mobile-first e de iteração visual rápida, escrever classes diretamente no JSX acelera o ciclo de design-implementação. O purge automático garante que o bundle final contenha apenas as classes utilizadas.
 
 **Sistema de design próprio:**
-Tokens semânticos foram definidos no `tailwind.config.js` (`primary`, `accent`, `bg`, `surface`, `border`, `error`, `success`) para garantir consistência visual e facilitar eventual redesign — trocar a paleta inteira exige alterar apenas o config, não varrer todos os componentes.
+Tokens semânticos foram definidos no `tailwind.config.js` (`primary`, `accent`, `bg`, `surface`, `border`, `error`, `success`) para garantir consistência visual e facilitar eventual redesign.
+
+**Layout responsivo:**
+O `#root` ocupa 100% da viewport. O conteúdo interno de cada tela usa `max-w-2xl mx-auto` para centralizar em desktop, mantendo largura total em mobile. Barras fixas (top e bottom) usam `left: 0; right: 0` para ocupar a tela toda independentemente da largura.
 
 ### Backend — Supabase (PostgreSQL)
 
 **Por que Supabase?**
-Supabase oferece PostgreSQL gerenciado com API REST gerada automaticamente via PostgREST, autenticação e Edge Functions em um único produto. Para o contexto da aplicação — backend sem servidor dedicado, prazo curto, equipe pequena — o Supabase elimina a necessidade de desenvolver e manter uma API própria.
+Supabase oferece PostgreSQL gerenciado com API REST gerada automaticamente via PostgREST e Edge Functions em um único produto. Para o contexto — backend sem servidor dedicado, prazo curto, equipe pequena — o Supabase elimina a necessidade de desenvolver e manter uma API própria.
 
 **Row Level Security (RLS):**
-Todas as tabelas têm RLS habilitado. As políticas foram cuidadosamente calibradas:
-- `clientes`, `pedidos` e `itens_pedido` → apenas **INSERT** permitido via anon key (dados sensíveis protegidos contra leitura externa)
-- `produtos` e `atendentes` → **SELECT** público (necessário para o funcionamento da aplicação)
+Todas as tabelas têm RLS habilitado. As políticas foram calibradas:
+- `clientes`, `pedidos` e `itens_pedido` → apenas **INSERT** via anon key
+- `atendentes` → **SELECT** e **INSERT** públicos
 - **DELETE** e **UPDATE** bloqueados em todas as tabelas via anon key
 
-Essa configuração garante que alguém que obtenha a anon key do bundle JavaScript não consiga extrair dados de clientes ou pedidos.
+### Catálogo de produtos — local
+
+Os 97 produtos COANA estão hardcoded em `src/constants/produtos.js`. Essa decisão elimina a dependência de rede para exibir o catálogo (crítico em ambiente de feira com sinal instável), reduz latência percebida para zero e simplifica a manutenção: atualizar um produto é editar um arquivo JS e reimplantar.
 
 ### Notificações — Supabase Edge Functions + Resend
 
-**Por que Edge Function e não chamada direta ao Resend do frontend?**
-Chamar a API do Resend diretamente do frontend exporia a API key no bundle JavaScript — qualquer usuário com DevTools poderia capturá-la. A Edge Function roda no servidor (Deno/TypeScript), mantendo a chave segura como secret de ambiente.
+A Edge Function `notify-pedido` é chamada após cada pedido registrado com sucesso — tanto no fluxo online quanto na sincronização de pedidos offline. Chamar o Resend diretamente do frontend exporia a API key no bundle. A Edge Function roda no servidor (Deno/TypeScript), mantendo a chave segura como secret de ambiente.
 
-O email é disparado de forma não-bloqueante: uma falha no envio não interrompe o registro do pedido no banco.
+O envio de email é não-bloqueante: uma falha não interrompe o registro do pedido.
 
 ### Pnpm
 
-Escolhido em vez de npm/yarn pelo tempo de instalação significativamente menor e pelo gerenciamento eficiente de espaço em disco via hard links. Em CI/CD e ambientes com múltiplos projetos, a diferença é perceptível.
+Escolhido pelo tempo de instalação menor e gerenciamento eficiente de espaço em disco via hard links.
 
 ---
 
@@ -61,7 +65,7 @@ Escolhido em vez de npm/yarn pelo tempo de instalação significativamente menor
 ```
 src/
 ├── pages/
-│   └── App.jsx              # Controlador central de steps (0–5)
+│   └── App.jsx              # Controlador central de steps (0–5) + sync offline
 ├── components/
 │   ├── IntroAnimation.jsx   # Splash screen com animação de entrada
 │   ├── ProgressBar.jsx      # Top bar fixa com navegação e progresso
@@ -69,78 +73,100 @@ src/
 │   ├── ClienteForm.jsx      # Cadastro do cliente B2B (step 2)
 │   ├── ProdutoSelector.jsx  # Catálogo com busca e seleção (step 3)
 │   ├── Checkout.jsx         # Revisão e envio do pedido (step 4)
-│   ├── Sucesso.jsx          # Confirmação pós-envio (step 5)
-│   └── ui/
-│       ├── Button.jsx       # Botão com variantes (primary, secondary, ghost)
-│       ├── Input.jsx        # Input com label, máscara e erro inline
-│       ├── Card.jsx         # Container clicável/selecionável
-│       ├── Badge.jsx        # Tags de código e status
-│       └── Skeleton.jsx     # Placeholder de loading
+│   └── Sucesso.jsx          # Confirmação pós-envio (step 5)
+├── constants/
+│   └── produtos.js          # 97 produtos COANA hardcoded
 ├── hooks/
-│   ├── usePedido.js         # Estado global do pedido em andamento
-│   └── useAtendente.js      # Busca de atendentes com fallback estático
+│   └── usePedido.js         # Estado do pedido em andamento
 └── lib/
     ├── supabase.js          # Cliente Supabase configurado
-    └── offline.js           # Buffer localStorage para modo offline
+    └── offline.js           # Buffer localStorage + sincronização
 supabase/
 ├── schema.sql               # DDL completo com RLS e índices
-├── seed_produtos.sql        # 97 produtos COANA
 └── functions/
     └── notify-pedido/
-        └── index.ts         # Edge Function — disparo de email via Resend
+        └── index.ts         # Edge Function — email via Resend
 ```
 
-### Fluxo de dados
+### Schema de `itens_pedido`
+
+Os itens não usam FK para a tabela de produtos. Em vez disso, armazenam `codigo_produto` e `nome_produto` diretamente. Isso desacopla os registros históricos de pedidos do catálogo de produtos — um produto pode ser editado ou removido sem afetar pedidos já registrados.
+
+```sql
+itens_pedido (
+  id              uuid primary key,
+  pedido_id       uuid references pedidos(id),
+  codigo_produto  text,
+  nome_produto    text,
+  quantidade      integer,
+  preco_unitario  numeric,
+  subtotal        numeric
+)
+```
+
+### Fluxo de dados — pedido online
 
 ```
-[Atendente] → App.jsx (step controller)
-                ├── usePedido (estado centralizado)
-                ├── salvarPedidoLocal() ← buffer offline ANTES da rede
-                ├── Supabase INSERT (clientes → atendentes → pedidos → itens)
-                ├── Edge Function notify-pedido → Resend → email
-                └── removerPedidoLocal() ← limpeza após sucesso
+[Atendente confirma no Checkout]
+  └── Supabase INSERT: clientes → atendentes → pedidos → itens_pedido
+        └── Edge Function notify-pedido → Resend → email
+              └── onSucesso({ offline: false }) → tela de Sucesso
+```
+
+### Fluxo de dados — pedido offline
+
+```
+[Rede indisponível no momento do envio]
+  └── salvarPedidoLocal(pedido) → localStorage
+        └── onSucesso({ offline: true }) → tela de Sucesso com banner amarelo
+
+[Rede retorna — evento 'online' ou 'visibilitychange']
+  └── syncPedidosPendentes()  ← mutex impede chamadas concorrentes
+        ├── Busca atendente existente por nome (evita duplicatas)
+        ├── Supabase INSERT: clientes → atendentes → pedidos → itens_pedido
+        ├── Edge Function notify-pedido → email
+        ├── removerPedidoLocal(timestamp)
+        └── toast de confirmação ao atendente
 ```
 
 **UUIDs gerados no cliente:**
-Para evitar dependência de `SELECT` após `INSERT` (bloqueado pelo RLS), os IDs são gerados no frontend via `crypto.randomUUID()` e passados diretamente no payload. Isso elimina uma round-trip ao banco e mantém a consistência das políticas de segurança.
+Para evitar `SELECT` após `INSERT` (bloqueado pelo RLS), os IDs são gerados no frontend via `crypto.randomUUID()`. Elimina round-trip ao banco e mantém consistência das políticas de segurança.
 
 ---
 
 ## Decisões de UX
 
-### Mobile-first com viewport 375px
+### Mobile-first com suporte a desktop
 
-O ambiente de uso — feira com atendentes em pé — exige que cada ação seja executável com **uma mão e um polegar**. Todos os elementos interativos têm altura mínima de 52px (recomendação Apple HIG e Material Design para touch targets). O layout foi projetado para 375px (iPhone SE/mini) e testa-se expansão até 480px.
+O ambiente principal de uso é mobile (atendente em pé com celular). Todos os elementos interativos têm altura mínima de 52px. Em desktop, o conteúdo centraliza em coluna (`max-w-2xl`) enquanto as barras fixas se expandem para full-width.
 
 ### ProgressBar unificada
 
-Em vez de cada tela ter seu próprio cabeçalho vermelho, foi introduzida uma **ProgressBar fixa no topo** com três informações simultâneas: botão de voltar contextual, nome da etapa atual e contador "Etapa X de 4". A barra de progresso linear comunica visualmente o avanço sem texto adicional. Isso reduz a carga cognitiva e elimina inconsistências visuais entre telas.
+Uma **ProgressBar fixa no topo** com três informações simultâneas: botão de voltar contextual, nome da etapa atual e contador "Etapa X de 4". A barra linear comunica o avanço sem texto adicional, reduzindo carga cognitiva.
 
 ### Offline-first com buffer local
 
-Antes de qualquer chamada de rede, o pedido é serializado e salvo no `localStorage`. Só após confirmação do Supabase o buffer é removido. Se a rede falhar (sinal ruim em ambiente de feira é comum), o pedido fica preservado localmente com feedback claro ao atendente — eliminando o risco de perda de pedidos por instabilidade de rede.
+Se a rede falhar no momento do envio, o pedido é salvo no `localStorage` com feedback claro ao atendente (banner amarelo). Na reconexão, a sincronização é automática e dispara o email normalmente. O banner só aparece quando o dispositivo estava genuinamente sem rede — pedidos com erro de Supabase enquanto online não exibem o banner.
 
 ### Mini-modal inline no seletor de produtos
 
-O padrão inicial usava um modal fullscreen para definir quantidade — interrompia completamente o fluxo de navegação da lista. A refatoração introduziu um **painel inline** que expande abaixo do card selecionado, mantendo o contexto visual do produto e permitindo ajustar e confirmar sem perder o fio da conversa com o cliente.
+Painel que expande abaixo do card selecionado para definir quantidade, mantendo o contexto visual do produto sem interromper o fluxo de navegação da lista.
 
 ### Botão flutuante com valor em tempo real
 
-O CTA de revisão de carrinho exibe `Revisar pedido · N produtos · R$ X.XXX,XX` em tempo real. Durante uma conversa comercial, o atendente pode mostrar o total acumulado ao cliente antes de finalizar — reduz atrito na hora de confirmar o pedido.
+O CTA de revisão exibe `Revisar pedido · N produtos · R$ X.XXX,XX` em tempo real, permitindo mostrar o total ao cliente antes de finalizar.
 
 ### Validação inline com mensagens específicas
 
-Cada campo do formulário de cliente tem mensagem de erro contextual (ex.: "CNPJ inválido. Verifique os 14 dígitos.") em vez do genérico "Campo obrigatório". A validação é ativada no `onBlur` (não no `onChange`), evitando erros prematuros enquanto o usuário ainda está digitando.
+Mensagens de erro contextuais por campo, ativadas no `onBlur` para evitar erros prematuros durante a digitação.
 
 ### Animações em CSS puro
 
-Sem bibliotecas de animação (Framer Motion, GSAP). Todas as transições — intro com `fadeIn/translateY`, check de sucesso com `cubic-bezier(0.34, 1.56, 0.64, 1)` (efeito elástico), abertura do mini-modal com `slideDown` — são implementadas via `@keyframes` no `index.css`. Bundle enxuto e animações performáticas executadas na GPU via `transform` e `opacity`.
+Sem bibliotecas de animação. Todas as transições são implementadas via `@keyframes` no `index.css`, executadas na GPU via `transform` e `opacity`.
 
-### Tipografia com hierarquia clara
+### Tipografia
 
-- **Inter** (sans-serif) para todo o corpo da interface — projetada especificamente para legibilidade em telas digitais
-- **Playfair Display** reservada apenas para títulos de tela — cria contraste tipográfico que ancora o usuário em qual etapa está
-- Textos numéricos (preços, totais) recebem `letter-spacing: -0.02em` para leitura mais rápida de valores monetários
+**Inter** (sans-serif) em toda a interface — projetada para legibilidade em telas digitais. Textos numéricos recebem `letter-spacing: -0.02em` para leitura mais rápida de valores monetários.
 
 ---
 
@@ -159,18 +185,9 @@ Sem bibliotecas de animação (Framer Motion, GSAP). Todas as transições — i
 ## Instalação e execução local
 
 ```bash
-# Clonar o repositório
-git clone https://github.com/seu-usuario/sistema-feirao-sp.git
-cd sistema-feirao-sp
-
-# Instalar dependências
+git clone https://github.com/gweissrs/Formulario_Consulfarma.git
+cd Formulario_Consulfarma
 pnpm install
-
-# Configurar variáveis de ambiente
-cp .env.example .env.local
-# Preencher VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY
-
-# Executar em desenvolvimento
 pnpm dev
 ```
 
@@ -178,16 +195,17 @@ pnpm dev
 
 ```env
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-anon-key
+VITE_SUPABASE_ANON_KEY=sua-publishable-key
 ```
+
+> Use a **Publishable key** do Supabase (prefixo `sb_publishable_...`), não a Secret key.
 
 ### Banco de dados
 
-Execute os scripts na seguinte ordem no SQL Editor do Supabase:
+Execute no SQL Editor do Supabase:
 
 ```
-1. supabase/schema.sql        # Criação das tabelas, RLS e índices
-2. supabase/seed_produtos.sql # Carga dos 97 produtos
+supabase/schema.sql   # Criação das tabelas, RLS e índices
 ```
 
 ### Edge Function
