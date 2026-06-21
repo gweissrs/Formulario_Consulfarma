@@ -62,7 +62,7 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
         </div>
       </div>
 
-      <div className="w-full max-w-2xl mx-auto px-4 pb-[80px] pt-2 flex flex-col gap-3">
+      <div className="w-full max-w-2xl mx-auto px-4 pb-8 pt-2 flex flex-col gap-3">
         <button
           onClick={onNovoPedido}
           className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"
@@ -76,6 +76,7 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
           Trocar atendente
         </button>
       </div>
+      <div className="h-14" />
     </div>
   )
 }

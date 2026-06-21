@@ -155,7 +155,7 @@ export function ClienteForm({ onConfirmar, atendente }) {
         />
       </div>
 
-      <div className="w-full max-w-2xl mx-auto px-4 pb-[80px] pt-2">
+      <div className="w-full max-w-2xl mx-auto px-4 pb-8 pt-2">
         <button
           onClick={handleSubmit}
           disabled={!tudoPreenchido}
@@ -169,6 +169,7 @@ export function ClienteForm({ onConfirmar, atendente }) {
           Avançar para produtos →
         </button>
       </div>
+      <div className="h-14" />
     </div>
   )
 }
