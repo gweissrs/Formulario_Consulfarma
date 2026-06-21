@@ -69,7 +69,8 @@ export async function syncPedidosPendentes() {
 
       const itens = pedido.itens.map(item => ({
         pedido_id: pedidoId,
-        produto_id: item.produto.id,
+        codigo_produto: item.produto.codigo,
+        nome_produto: item.produto.nome,
         quantidade: item.quantidade,
         preco_unitario: item.produto.preco_env,
         subtotal: item.produto.preco_env * item.quantidade,
