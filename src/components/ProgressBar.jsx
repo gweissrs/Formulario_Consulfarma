@@ -11,8 +11,8 @@ export function ProgressBar({ step, onVoltar }) {
   const progresso = (step / 4) * 100
 
   return (
-    <div className="fixed-bar bg-surface border-b border-border" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-      <div className="h-14 flex items-center px-4 max-w-5xl mx-auto">
+    <div className="fixed-bar">
+      <div className="bg-surface border-b border-border h-14 flex items-center px-4" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
         <div className="w-1/4 flex items-center gap-2">
           <img
             src="/favicon.png"
