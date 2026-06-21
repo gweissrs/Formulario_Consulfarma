@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, Plus, Minus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -88,7 +88,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
           Produtos de Interesse
         </h1>
         <p className="text-[14px] text-gray-400 mb-4">
-          Selecione os probiÃ³ticos e informe a quantidade desejada.
+          Selecione os probióticos e informe a quantidade desejada.
         </p>
         <div className="relative">
           <Search
@@ -99,7 +99,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
             type="search"
             value={busca}
             onChange={e => setBusca(e.target.value)}
-            placeholder="Buscar por nome ou cÃ³digo..."
+            placeholder="Buscar por nome ou código..."
             className="w-full pl-10 pr-4 py-[11px] rounded-xl border-[1.5px] border-border bg-surface text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary transition-colors duration-150"
           />
         </div>
@@ -143,7 +143,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
                         </span>
                         {semPreco && (
                           <span className="inline-flex items-center px-[7px] py-[2px] rounded bg-gray-100 text-[11px] text-gray-400">
-                            IndisponÃ­vel
+                            Indisponível
                           </span>
                         )}
                       </div>
@@ -223,7 +223,7 @@ export function ProdutoSelector({ itens, onAdicionarItem, onVerCarrinho }) {
               onClick={onVerCarrinho}
               className="w-full h-[52px] rounded-xl bg-primary text-white font-semibold text-[15px] hover:bg-primary-hover transition-colors duration-150"
             >
-              Revisar pedido Â· {totalItens} {totalItens === 1 ? 'produto' : 'produtos'} Â· {totalFormatado}
+              Revisar pedido · {totalItens} {totalItens === 1 ? 'produto' : 'produtos'} · {totalFormatado}
             </button>
           </div>
         </div>

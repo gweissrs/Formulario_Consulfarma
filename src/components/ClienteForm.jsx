@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { Input } from './ui/Input'
 
 function aplicarMascaraCNPJ(valor) {
@@ -49,21 +49,21 @@ export function ClienteForm({ onConfirmar, atendente }) {
   function validarCampo(campo, valor) {
     if (!valor.trim()) {
       const mensagens = {
-        razaoSocial: 'Informe a razÃ£o social da empresa.',
-        cnpj: 'CNPJ invÃ¡lido. Verifique os 14 dÃ­gitos.',
-        email: 'Informe um e-mail vÃ¡lido.',
-        whatsapp: 'NÃºmero invÃ¡lido. Use o formato (00) 00000-0000.',
+        razaoSocial: 'Informe a razão social da empresa.',
+        cnpj: 'CNPJ inválido. Verifique os 14 dígitos.',
+        email: 'Informe um e-mail válido.',
+        whatsapp: 'Número inválido. Use o formato (00) 00000-0000.',
       }
       return mensagens[campo]
     }
     if (campo === 'cnpj') {
       const digits = valor.replace(/\D/g, '')
-      if (digits.length !== 14) return 'CNPJ invÃ¡lido. Verifique os 14 dÃ­gitos.'
+      if (digits.length !== 14) return 'CNPJ inválido. Verifique os 14 dígitos.'
     }
-    if (campo === 'email' && !validarEmail(valor)) return 'Informe um e-mail vÃ¡lido.'
+    if (campo === 'email' && !validarEmail(valor)) return 'Informe um e-mail válido.'
     if (campo === 'whatsapp') {
       const digits = valor.replace(/\D/g, '')
-      if (digits.length !== 11) return 'NÃºmero invÃ¡lido. Use o formato (00) 00000-0000.'
+      if (digits.length !== 11) return 'Número inválido. Use o formato (00) 00000-0000.'
     }
     return ''
   }
@@ -106,12 +106,12 @@ export function ClienteForm({ onConfirmar, atendente }) {
             Dados do Cliente
           </h1>
           <p className="text-[14px] text-gray-400">
-            Preencha com as informaÃ§Ãµes da empresa interessada.
+            Preencha com as informações da empresa interessada.
           </p>
         </div>
 
         <Input
-          label="RazÃ£o Social"
+          label="Razão Social"
           value={campos.razaoSocial}
           onChange={e => atualizarCampo('razaoSocial', e.target.value)}
           onBlur={() => marcarTocado('razaoSocial')}
@@ -166,7 +166,7 @@ export function ClienteForm({ onConfirmar, atendente }) {
             hover:bg-primary-hover active:bg-primary-dark
           `}
         >
-          AvanÃ§ar para produtos â†’
+          Avançar para produtos →
         </button>
       </div>
     </div>

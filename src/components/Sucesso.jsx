@@ -1,4 +1,4 @@
-﻿import { Check, WifiOff } from 'lucide-react'
+import { Check, WifiOff } from 'lucide-react'
 
 function formatarMoeda(valor) {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -21,14 +21,14 @@ export function Sucesso({ pedido, valorTotal, offline, onNovoPedido, onTrocarAte
           Pedido registrado!
         </h1>
         <p className="text-[14px] text-gray-400 text-center">
-          Nossa equipe entrarÃ¡ em contato em breve.
+          Nossa equipe entrará em contato em breve.
         </p>
 
         {offline && (
           <div className="flex items-start gap-3 mt-5 w-full max-w-sm bg-[#FFF8E1] border border-accent rounded-xl p-3">
             <WifiOff size={18} className="text-accent flex-shrink-0 mt-0.5" />
             <p className="text-[13px] text-gray-700">
-              Pedido salvo localmente. SerÃ¡ enviado automaticamente quando a conexÃ£o retornar.
+              Pedido salvo localmente. Será enviado automaticamente quando a conexão retornar.
             </p>
           </div>
         )}

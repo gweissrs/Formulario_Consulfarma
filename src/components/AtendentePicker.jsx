@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { User } from 'lucide-react'
 
 const ATENDENTES = [
@@ -24,7 +24,7 @@ export function AtendentePicker({ onConfirmar }) {
     <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
       <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 flex flex-col">
         <h1 className="font-sans text-[26px] font-bold text-gray-900 mb-1">
-          Quem estÃ¡ atendendo?
+          Quem está atendendo?
         </h1>
         <p className="text-[14px] text-gray-400 mb-6">
           Selecione seu nome para registrar o pedido corretamente.
@@ -67,7 +67,7 @@ export function AtendentePicker({ onConfirmar }) {
             hover:bg-primary-hover active:bg-primary-dark
           `}
         >
-          Confirmar e continuar â†’
+          Confirmar e continuar →
         </button>
       </div>
     </div>
