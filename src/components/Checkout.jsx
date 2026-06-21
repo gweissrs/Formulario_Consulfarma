@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '../lib/supabase'
@@ -88,15 +88,15 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
           body: { ...payloadPedido, pedidoId },
         })
       } catch {
-        // Falha no email não bloqueia o fluxo
+        // Falha no email nÃ£o bloqueia o fluxo
       }
 
       removerPedidoLocal(timestampLocal)
       onSucesso({ offline: false })
     } catch (err) {
       console.error('Erro ao enviar pedido:', err)
-      toast('Pedido salvo localmente. Será sincronizado quando a conexão retornar.', {
-        icon: '⚠️',
+      toast('Pedido salvo localmente. SerÃ¡ sincronizado quando a conexÃ£o retornar.', {
+        icon: 'âš ï¸',
         style: { background: '#FEF3C7', color: '#92400E' },
         duration: 5000,
       })
@@ -110,8 +110,8 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
     <div className="min-h-screen bg-bg flex flex-col step-transicao pt-[59px]">
       <div className="flex-1 w-full max-w-2xl mx-auto px-4 py-6 flex flex-col gap-5">
         <div>
-          <h1 className="font-display text-[26px] font-bold text-gray-900 mb-1">
-            Revisão do Pedido
+          <h1 className="font-sans text-[26px] font-bold text-gray-900 mb-1">
+            RevisÃ£o do Pedido
           </h1>
           <p className="text-[14px] text-gray-400">
             Confirme os itens antes de enviar.
@@ -159,7 +159,7 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
                           onClick={() => atualizarQuantidade(produto, quantidade - 1)}
                           className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
                         >
-                          −
+                          âˆ’
                         </button>
                         <input
                           type="number"
@@ -192,11 +192,11 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
         {/* Total */}
         <div className="bg-[#FDF5F5] border border-accent rounded-xl p-4">
           <p className="text-[13px] text-gray-700 mb-1">Valor estimado do pedido</p>
-          <p className="font-display text-[32px] font-bold text-primary leading-none">
+          <p className="font-sans text-[32px] font-bold text-primary leading-none">
             {formatarMoeda(valorTotal)}
           </p>
           <p className="text-[11px] text-gray-400 mt-2">
-            * Sujeito a confirmação comercial
+            * Sujeito a confirmaÃ§Ã£o comercial
           </p>
         </div>
       </div>
