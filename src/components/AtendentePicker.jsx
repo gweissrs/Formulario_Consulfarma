@@ -56,7 +56,7 @@ export function AtendentePicker({ onConfirmar }) {
         </div>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto px-4 pb-8 pt-2">
+      <div className="w-full max-w-4xl mx-auto px-4 pb-[80px] pt-2">
         <button
           onClick={handleConfirmar}
           disabled={!selecionado}

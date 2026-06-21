@@ -208,7 +208,7 @@ export function Checkout({ pedido, valorTotal, onRemoverItem, onAdicionarItem, o
         </div>
       </div>
 
-      <div className="w-full max-w-2xl mx-auto px-4 pb-8 pt-2">
+      <div className="w-full max-w-2xl mx-auto px-4 pb-[80px] pt-2">
         <button
           onClick={handleEnviar}
           disabled={enviando || pedido.itens.length === 0}
